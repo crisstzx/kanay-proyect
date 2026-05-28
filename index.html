@@ -252,7 +252,7 @@
                 });
 
                 document.getElementById('bol-subtotal').innerText = `S/. ${resultado.cuenta.subtotal.toFixed(2)}`;
-                document.getElementById('bol-igv').innerText = `S/. ${resultado.cuenta.igv.toFixed(2)}`;
+                document.getElementById('bol-igv').innerText = `S/. ${resultado.cuenta.igv_18.toFixed(2)}`;
                 document.getElementById('bol-total').innerText = `S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}`;
 
                 document.getElementById('modal-boleta').classList.add('active');
