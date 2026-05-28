@@ -23,7 +23,7 @@
         label { display: block; font-size: 14px; color: #a0a0a0; margin-bottom: 6px; font-weight: 500; }
         select, input[type="number"] { width: 100%; height: 44px; background: #2d2d2d; color: white; border: 1px solid #3d3d3d; border-radius: 8px; padding: 0 12px; font-size: 16px; -webkit-appearance: none; }
 
-        /* Lista de Platos en Tarjetas Móviles */
+        /* Lista de Platos en Tarjetas */
         .section-title { font-size: 16px; color: #ff4757; margin-bottom: 12px; font-weight: bold; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; }
         .menu-item { background: #1e1e1e; display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2d2d2d; }
         .item-info { text-align: left; flex: 1; padding-right: 10px; }
@@ -36,10 +36,23 @@
         .btn-qty:active { background: #3d3d3d; }
         .qty-value { width: 30px; text-align: center; font-size: 15px; font-weight: bold; color: white; }
 
-        /* Barra Inferior Fija con el Botón de Acción */
+        /* Barra Inferior Fija con el Botón */
         .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #1f1f1f; padding: 12px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000; border-top: 1px solid #2d2d2d; display: flex; justify-content: center; }
-        .btn-order { width: 100%; max-width: 450px; height: 50px; background: #2ed573; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(46, 213, 115, 0.3); transition: background 0.2s; -webkit-tap-highlight-color: transparent; }
+        .btn-order { width: 100%; max-width: 450px; height: 50px; background: #2ed573; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(46, 213, 115, 0.3); -webkit-tap-highlight-color: transparent; }
         .btn-order:active { background: #26af5f; transform: scale(0.98); }
+
+        /* --- VENTANA DE LA BOLETA (MODAL) --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 16px; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .boleta-box { background: #ffffff; color: #000000; width: 100%; max-width: 360px; border-radius: 4px; padding: 20px; font-family: 'Courier New', Courier, monospace; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-top: 8px dashed #ff4757; }
+        .boleta-header { text-align: center; margin-bottom: 15px; }
+        .boleta-title { font-weight: bold; font-size: 18px; margin-bottom: 2px; }
+        .boleta-line { border-top: 1px dashed #000; margin: 10px 0; }
+        .boleta-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+        .boleta-items { margin: 10px 0; }
+        .boleta-total-section { font-weight: bold; margin-top: 10px; }
+        .btn-cerrar { width: 100%; height: 40px; background: #121212; color: white; border: none; font-weight: bold; margin-top: 15px; border-radius: 4px; cursor: pointer; font-family: sans-serif; }
     </style>
 </head>
 <body>
@@ -74,11 +87,10 @@
             </div>
         </div>
 
-        <!-- Sección de Platos -->
+        <!-- Secciones de Menú -->
         <div class="section-title">Platos de Fondo</div>
         <div id="lista-platos"></div>
 
-        <!-- Sección de Bebidas -->
         <div class="section-title" style="margin-top: 20px;">Bebidas</div>
         <div id="lista-bebidas"></div>
     </div>
@@ -88,8 +100,59 @@
         <button class="btn-order" onclick="enviarPedido()">CONFIRMAR PEDIDO</button>
     </div>
 
+    <!-- --- ESTRUCTURA DE LA BOLETA FLOTANTE --- -->
+    <div class="modal-overlay" id="modal-boleta">
+        <div class="boleta-box">
+            <div class="boleta-header">
+                <div class="boleta-title">SISTEMA KANAY S.A.C.</div>
+                <div style="font-size: 12px;">Cajamarca, Perú</div>
+                <div style="font-size: 12px;" id="bol-fecha">Fecha: --/--/----</div>
+                <div class="boleta-line"></div>
+                <div style="font-weight: bold;" id="bol-id">BOLETA: #00000</div>
+                <div id="bol-mesa" style="font-size: 13px;">MESA: X</div>
+            </div>
+            
+            <div class="boleta-line"></div>
+            <div class="boleta-row" style="font-weight: bold; font-size: 12px;">
+                <span>CANT. PRODUCTO</span>
+                <span>TOTAL</span>
+            </div>
+            <div class="boleta-line"></div>
+            
+            <!-- Aquí entran los platos dinámicamente -->
+            <div class="boleta-items" id="bol-productos"></div>
+            
+            <div class="boleta-line"></div>
+            
+            <!-- Precios calculados por tu Python -->
+            <div class="boleta-row">
+                <span>Subtotal:</span>
+                <span id="bol-subtotal">S/. 0.00</span>
+            </div>
+            <div class="boleta-row">
+                <span>IGV (18%):</span>
+                <span id="bol-igv">S/. 0.00</span>
+            </div>
+            <div class="boleta-line"></div>
+            <div class="boleta-row boleta-total-section">
+                <span>TOTAL A PAGAR:</span>
+                <span id="bol-total" style="font-size: 16px;">S/. 0.00</span>
+            </div>
+            <div class="boleta-row" style="margin-top: 5px; font-size: 12px;">
+                <span>Método Pago:</span>
+                <span id="bol-pago" style="font-weight: bold;">-</span>
+            </div>
+            
+            <div class="boleta-line"></div>
+            <div style="text-align: center; font-size: 12px; font-style: italic;">
+                ¡Gracias por su preferencia!<br>Su pedido ya se está cocinando.
+            </div>
+            
+            <button class="btn-cerrar" onclick="cerrarBoleta()">CERRAR</button>
+        </div>
+    </div>
+
 <script>
-    // Tu menú original con precios estructurado por categorías
     const PLATOS = {
         1: {nombre: "Lomo Saltado", precio: 25.00},
         2: {nombre: "Ají de Gallina", precio: 18.00},
@@ -109,12 +172,13 @@
         13: {nombre: "Chicha Morada (Jarra)", precio: 15.00},
         14: {nombre: "Limonada Frozen", precio: 10.00},
         15: {nombre: "Jugo de Maracuyá", precio: 8.00},
-        16: {nombre: "Gaseosa (Inca Kola/Coca Cola)", precio: 5.00},
+        16: {nombre: "Gaseosa", precio: 5.00},
         17: {nombre: "Cerveza Personal", precio: 9.00},
         18: {nombre: "Agua Mineral", precio: 4.00}
     };
 
-    // Funciones para Renderizar dinámicamente en el celular
+    const TODOS_PRODUCTOS = {...PLATOS, ...BEBIDAS};
+
     function renderizarSeccion(objetoProductos, contenedorId) {
         const contenedor = document.getElementById(contenedorId);
         for (let id in objetoProductos) {
@@ -137,7 +201,6 @@
     renderizarSeccion(PLATOS, 'lista-platos');
     renderizarSeccion(BEBIDAS, 'lista-bebidas');
 
-    // Manejo interactivo de cantidades (+ y -) sin usar teclado numérico
     function cambiarCantidad(id, cambio) {
         const elemento = document.getElementById(`cant-${id}`);
         let cantidadActual = parseInt(elemento.innerText);
@@ -147,15 +210,12 @@
         }
     }
 
-    // Envío de datos a Render mediante la API
     async function enviarPedido() {
         const mesa = parseInt(document.getElementById('mesa').value);
         const metodoPago = document.getElementById('pago').value;
         
         let productosSeleccionados = [];
-        const TODOS_LOS_PRODUCTOS = {...PLATOS, ...BEBIDAS};
-
-        for (let id in TODOS_LOS_PRODUCTOS) {
+        for (let id in TODOS_PRODUCTOS) {
             const cant = parseInt(document.getElementById(`cant-${id}`).innerText);
             if (cant > 0) {
                 productosSeleccionados.push({
@@ -166,7 +226,7 @@
         }
 
         if (productosSeleccionados.length === 0) {
-            alert("Por favor, añade al menos un producto pulsando el botón (+).");
+            alert("Por favor, añade al menos un producto.");
             return;
         }
 
@@ -186,16 +246,48 @@
             const resultado = await respuesta.json();
             
             if (respuesta.ok) {
-                alert(`¡PEDIDO ENVIADO A COCINA!\n\nID: ${resultado.id_pedido}\nTotal a pagar: S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}\n\nMétodo: ${resultado.pago}\n\n${resultado.estado_final}`);
-                // Reiniciar el carrito tras el éxito
-                for (let id in TODOS_LOS_PRODUCTOS) {
-                    document.getElementById(`cant-${id}`).innerText = "0";
-                }
+                // --- ARMAR Y MOSTRAR LA BOLETA ---
+                document.getElementById('bol-id').innerText = `BOLETA: #${resultado.id_pedido.substring(0,8).toUpperCase()}`;
+                document.getElementById('bol-mesa').innerText = `MESA SELECCIONADA: ${mesa}`;
+                document.getElementById('bol-pago').innerText = resultado.pago;
+                document.getElementById('bol-fecha').innerText = `Fecha: ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                
+                // Cargar ítems en la boleta
+                const contenedorItems = document.getElementById('bol-productos');
+                contenedorItems.innerHTML = '';
+                
+                productosSeleccionados.forEach(prod => {
+                    const infoProd = TODOS_PRODUCTOS[prod.opcionMenu];
+                    const subtotalItem = infoProd.precio * prod.cantidad;
+                    contenedorItems.innerHTML += `
+                        <div class="boleta-row">
+                            <span>${prod.cantidad}x ${infoProd.nombre}</span>
+                            <span>S/. ${subtotalItem.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+
+                // Cargar valores económicos calculados por Render (Python)
+                document.getElementById('bol-subtotal').innerText = `S/. ${resultado.cuenta.subtotal.toFixed(2)}`;
+                document.getElementById('bol-igv').innerText = `S/. ${resultado.cuenta.igv.toFixed(2)}`;
+                document.getElementById('bol-total').innerText = `S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}`;
+
+                // Mostrar la boleta con animación
+                document.getElementById('modal-boleta').classList.add('active');
+
             } else {
                 alert(`Error: ${resultado.detail}`);
             }
         } catch (error) {
-            alert("No se pudo conectar con el servidor de Render. Asegúrate de que el backend esté encendido.");
+            alert("Error al conectar con Render.");
+        }
+    }
+
+    function cerrarBoleta() {
+        document.getElementById('modal-boleta').classList.remove('active');
+        // Limpiar contadores de la app
+        for (let id in TODOS_PRODUCTOS) {
+            document.getElementById(`cant-${id}`).innerText = "0";
         }
     }
 </script>
