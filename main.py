@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# Configuración completa de CORS para permitir la comunicación con GitHub Pages
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,7 +22,7 @@ class ItemPedido(BaseModel):
 class PedidoEntrada(BaseModel):
     mesa: int
     productos: List[ItemPedido]
-    metodoPago: str  # "1": Efectivo, "2": Tarjeta, "3": Yape
+    metodoPago: str  # Acepta tanto "1" como "Yape / Plin"
 
 # Diccionario con tu menú original para procesar los precios
 MENU = {
@@ -88,10 +89,23 @@ def recibir_pedido(pedido: PedidoEntrada):
     igv = subtotal * 0.18
     total = subtotal + igv
     
-    nombre_metodo = METODOS_PAGO.get(pedido.metodoPago, "No especificado")
+    # PROCESAMIENTO TOLERANTE DEL MÉTODO DE PAGO:
+    # Si viene texto largo como "Yape / Plin", extrae "Yape" o mapea el ID numérico
+    pago_recibido = pedido.metodoPago.strip()
+    nombre_metodo = "No especificado"
+    
+    if pago_recibido in METODOS_PAGO:
+        nombre_metodo = METODOS_PAGO[pago_recibido]
+    elif "efectivo" in pago_recibido.lower():
+        nombre_metodo = "Efectivo"
+    elif "tarjeta" in pago_recibido.lower():
+        nombre_metodo = "Tarjeta"
+    elif "yape" in pago_recibido.lower() or "plin" in pago_recibido.lower():
+        nombre_metodo = "Yape"
+    
     idPedido = f"KANAY-{pedido.mesa}-2026"
     
-    # Devolvemos la respuesta que antes se imprimía en pantalla
+    # Devolvemos la respuesta formateada con la estructura que espera tu index.html
     return {
         "id_pedido": idPedido,
         "mesa": pedido.mesa,
