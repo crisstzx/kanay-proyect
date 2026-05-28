@@ -5,43 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kanay - Menú Digital</title>
     <style>
-        /* Estilos Base estilo App Móvil */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: #121212; color: #e0e0e0; padding-bottom: 90px; }
         
-        /* Barra Superior Fija */
         .app-header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #1f1f1f; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 2px solid #ff4757; }
         .app-header h1 { color: #ff4757; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
 
-        /* Contenedor Principal */
         .app-container { padding: 80px 16px 20px 16px; max-width: 480px; margin: 0 auto; }
 
-        /* Configuración de Mesa y Pago */
         .config-section { background: #1e1e1e; padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d2d2d; }
         .config-group { margin-bottom: 12px; }
         .config-group:last-child { margin-bottom: 0; }
         label { display: block; font-size: 14px; color: #a0a0a0; margin-bottom: 6px; font-weight: 500; }
         select, input[type="number"] { width: 100%; height: 44px; background: #2d2d2d; color: white; border: 1px solid #3d3d3d; border-radius: 8px; padding: 0 12px; font-size: 16px; -webkit-appearance: none; }
 
-        /* Lista de Platos en Tarjetas */
         .section-title { font-size: 16px; color: #ff4757; margin-bottom: 12px; font-weight: bold; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; }
         .menu-item { background: #1e1e1e; display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2d2d2d; }
         .item-info { text-align: left; flex: 1; padding-right: 10px; }
         .item-name { font-size: 16px; font-weight: 600; color: #ffffff; margin-bottom: 4px; }
         .item-price { font-size: 14px; color: #2ed573; font-weight: bold; }
         
-        /* Controles de Cantidad (+ / -) */
         .quantity-control { display: flex; align-items: center; background: #2d2d2d; border-radius: 8px; overflow: hidden; height: 36px; }
         .btn-qty { background: none; border: none; color: #ff4757; width: 36px; height: 36px; font-size: 18px; font-weight: bold; cursor: pointer; }
         .btn-qty:active { background: #3d3d3d; }
         .qty-value { width: 30px; text-align: center; font-size: 15px; font-weight: bold; color: white; }
 
-        /* Barra Inferior Fija con el Botón */
         .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #1f1f1f; padding: 12px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000; border-top: 1px solid #2d2d2d; display: flex; justify-content: center; }
         .btn-order { width: 100%; max-width: 450px; height: 50px; background: #2ed573; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(46, 213, 115, 0.3); -webkit-tap-highlight-color: transparent; }
         .btn-order:active { background: #26af5f; transform: scale(0.98); }
 
-        /* --- VENTANA DE LA BOLETA (MODAL) --- */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 16px; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
@@ -57,13 +49,11 @@
 </head>
 <body>
 
-    <!-- Cabecera de la App -->
     <div class="app-header">
         <h1>KANAY PEDIDOS</h1>
     </div>
 
     <div class="app-container">
-        <!-- Configuración Inicial de la Mesa -->
         <div class="config-section">
             <div class="config-group">
                 <label for="mesa">Tu Número de Mesa:</label>
@@ -87,7 +77,6 @@
             </div>
         </div>
 
-        <!-- Secciones de Menú -->
         <div class="section-title">Platos de Fondo</div>
         <div id="lista-platos"></div>
 
@@ -95,12 +84,10 @@
         <div id="lista-bebidas"></div>
     </div>
 
-    <!-- Botón Fijo Inferior -->
     <div class="footer-action">
         <button class="btn-order" onclick="enviarPedido()">CONFIRMAR PEDIDO</button>
     </div>
 
-    <!-- --- ESTRUCTURA DE LA BOLETA FLOTANTE --- -->
     <div class="modal-overlay" id="modal-boleta">
         <div class="boleta-box">
             <div class="boleta-header">
@@ -119,12 +106,10 @@
             </div>
             <div class="boleta-line"></div>
             
-            <!-- Aquí entran los platos dinámicamente -->
             <div class="boleta-items" id="bol-productos"></div>
             
             <div class="boleta-line"></div>
             
-            <!-- Precios calculados por tu Python -->
             <div class="boleta-row">
                 <span>Subtotal:</span>
                 <span id="bol-subtotal">S/. 0.00</span>
@@ -237,6 +222,7 @@
         };
 
         try {
+            // AQUÍ ESTABA EL ERROR CORREGIDO: URL apuntando directo a /ordenar en Render
             const respuesta = await fetch('https://kanay-proyect.onrender.com/ordenar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -246,13 +232,11 @@
             const resultado = await respuesta.json();
             
             if (respuesta.ok) {
-                // --- ARMAR Y MOSTRAR LA BOLETA ---
                 document.getElementById('bol-id').innerText = `BOLETA: #${resultado.id_pedido.substring(0,8).toUpperCase()}`;
                 document.getElementById('bol-mesa').innerText = `MESA SELECCIONADA: ${mesa}`;
                 document.getElementById('bol-pago').innerText = resultado.pago;
                 document.getElementById('bol-fecha').innerText = `Fecha: ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
                 
-                // Cargar ítems en la boleta
                 const contenedorItems = document.getElementById('bol-productos');
                 contenedorItems.innerHTML = '';
                 
@@ -267,25 +251,22 @@
                     `;
                 });
 
-                // Cargar valores económicos calculados por Render (Python)
                 document.getElementById('bol-subtotal').innerText = `S/. ${resultado.cuenta.subtotal.toFixed(2)}`;
                 document.getElementById('bol-igv').innerText = `S/. ${resultado.cuenta.igv.toFixed(2)}`;
                 document.getElementById('bol-total').innerText = `S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}`;
 
-                // Mostrar la boleta con animación
                 document.getElementById('modal-boleta').classList.add('active');
 
             } else {
                 alert(`Error: ${resultado.detail}`);
             }
         } catch (error) {
-            alert("Error al conectar con Render.");
+            alert("Error al conectar con Render. Asegúrate de que el backend esté encendido.");
         }
     }
 
     function cerrarBoleta() {
         document.getElementById('modal-boleta').classList.remove('active');
-        // Limpiar contadores de la app
         for (let id in TODOS_PRODUCTOS) {
             document.getElementById(`cant-${id}`).innerText = "0";
         }
