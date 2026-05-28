@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kanay - Menú Digital</title>
+    <style>
+        /* Estilos Base estilo App Móvil */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #121212; color: #e0e0e0; padding-bottom: 90px; }
+        
+        /* Barra Superior Fija */
+        .app-header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #1f1f1f; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 2px solid #ff4757; }
+        .app-header h1 { color: #ff4757; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+
+        /* Contenedor Principal */
+        .app-container { padding: 80px 16px 20px 16px; max-width: 480px; margin: 0 auto; }
+
+        /* Configuración de Mesa y Pago */
+        .config-section { background: #1e1e1e; padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d2d2d; }
+        .config-group { margin-bottom: 12px; }
+        .config-group:last-child { margin-bottom: 0; }
+        label { display: block; font-size: 14px; color: #a0a0a0; margin-bottom: 6px; font-weight: 500; }
+        select, input[type="number"] { width: 100%; height: 44px; background: #2d2d2d; color: white; border: 1px solid #3d3d3d; border-radius: 8px; padding: 0 12px; font-size: 16px; -webkit-appearance: none; }
+
+        /* Lista de Platos en Tarjetas Móviles */
+        .section-title { font-size: 16px; color: #ff4757; margin-bottom: 12px; font-weight: bold; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; }
+        .menu-item { background: #1e1e1e; display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2d2d2d; }
+        .item-info { text-align: left; flex: 1; padding-right: 10px; }
+        .item-name { font-size: 16px; font-weight: 600; color: #ffffff; margin-bottom: 4px; }
+        .item-price { font-size: 14px; color: #2ed573; font-weight: bold; }
+        
+        /* Controles de Cantidad (+ / -) */
+        .quantity-control { display: flex; align-items: center; background: #2d2d2d; border-radius: 8px; overflow: hidden; height: 36px; }
+        .btn-qty { background: none; border: none; color: #ff4757; width: 36px; height: 36px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .btn-qty:active { background: #3d3d3d; }
+        .qty-value { width: 30px; text-align: center; font-size: 15px; font-weight: bold; color: white; }
+
+        /* Barra Inferior Fija con el Botón de Acción */
+        .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #1f1f1f; padding: 12px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000; border-top: 1px solid #2d2d2d; display: flex; justify-content: center; }
+        .btn-order { width: 100%; max-width: 450px; height: 50px; background: #2ed573; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(46, 213, 115, 0.3); transition: background 0.2s; -webkit-tap-highlight-color: transparent; }
+        .btn-order:active { background: #26af5f; transform: scale(0.98); }
+    </style>
+</head>
+<body>
+
+    <!-- Cabecera de la App -->
+    <div class="app-header">
+        <h1>KANAY PEDIDOS</h1>
+    </div>
+
+    <div class="app-container">
+        <!-- Configuración Inicial de la Mesa -->
+        <div class="config-section">
+            <div class="config-group">
+                <label for="mesa">Tu Número de Mesa:</label>
+                <select id="mesa">
+                    <option value="1">Mesa 1</option>
+                    <option value="2">Mesa 2</option>
+                    <option value="3">Mesa 3</option>
+                    <option value="4">Mesa 4</option>
+                    <option value="5">Mesa 5</option>
+                    <option value="6">Mesa 6</option>
+                    <option value="7">Mesa 7</option>
+                </select>
+            </div>
+            <div class="config-group">
+                <label for="pago">¿Cómo deseas pagar?</label>
+                <select id="pago">
+                    <option value="3">Yape / Plin</option>
+                    <option value="1">Efectivo</option>
+                    <option value="2">Tarjeta Crédito/Débito</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Sección de Platos -->
+        <div class="section-title">Platos de Fondo</div>
+        <div id="lista-platos"></div>
+
+        <!-- Sección de Bebidas -->
+        <div class="section-title" style="margin-top: 20px;">Bebidas</div>
+        <div id="lista-bebidas"></div>
+    </div>
+
+    <!-- Botón Fijo Inferior -->
+    <div class="footer-action">
+        <button class="btn-order" onclick="enviarPedido()">CONFIRMAR PEDIDO</button>
+    </div>
+
+<script>
+    // Tu menú original con precios estructurado por categorías
+    const PLATOS = {
+        1: {nombre: "Lomo Saltado", precio: 25.00},
+        2: {nombre: "Ají de Gallina", precio: 18.00},
+        3: {nombre: "Pescado frito", precio: 16.00},
+        4: {nombre: "Alitas BBQ", precio: 22.00},
+        5: {nombre: "Ceviche", precio: 20.00},
+        6: {nombre: "Postre del Día", precio: 12.00},
+        7: {nombre: "Arroz a la cubana", precio: 15.00},
+        8: {nombre: "Chaufa de pollo", precio: 21.00},
+        9: {nombre: "Tallarines verdes", precio: 19.00},
+        10: {nombre: "Pollo a la brasa", precio: 30.00},
+        11: {nombre: "Causa limeña", precio: 14.00},
+        12: {nombre: "Arroz con pato", precio: 25.00}
+    };
+
+    const BEBIDAS = {
+        13: {nombre: "Chicha Morada (Jarra)", precio: 15.00},
+        14: {nombre: "Limonada Frozen", precio: 10.00},
+        15: {nombre: "Jugo de Maracuyá", precio: 8.00},
+        16: {nombre: "Gaseosa (Inca Kola/Coca Cola)", precio: 5.00},
+        17: {nombre: "Cerveza Personal", precio: 9.00},
+        18: {nombre: "Agua Mineral", precio: 4.00}
+    };
+
+    // Funciones para Renderizar dinámicamente en el celular
+    function renderizarSeccion(objetoProductos, contenedorId) {
+        const contenedor = document.getElementById(contenedorId);
+        for (let id in objetoProductos) {
+            contenedor.innerHTML += `
+                <div class="menu-item">
+                    <div class="item-info">
+                        <div class="item-name">${objetoProductos[id].nombre}</div>
+                        <div class="item-price">S/. ${objetoProductos[id].precio.toFixed(2)}</div>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="btn-qty" onclick="cambiarCantidad(${id}, -1)">-</button>
+                        <div class="qty-value" id="cant-${id}">0</div>
+                        <button class="btn-qty" onclick="cambiarCantidad(${id}, 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    renderizarSeccion(PLATOS, 'lista-platos');
+    renderizarSeccion(BEBIDAS, 'lista-bebidas');
+
+    // Manejo interactivo de cantidades (+ y -) sin usar teclado numérico
+    function cambiarCantidad(id, cambio) {
+        const elemento = document.getElementById(`cant-${id}`);
+        let cantidadActual = parseInt(elemento.innerText);
+        cantidadActual += cambio;
+        if (cantidadActual >= 0 && cantidadActual <= 10) {
+            elemento.innerText = cantidadActual;
+        }
+    }
+
+    // Envío de datos a Render mediante la API
+    async function enviarPedido() {
+        const mesa = parseInt(document.getElementById('mesa').value);
+        const metodoPago = document.getElementById('pago').value;
+        
+        let productosSeleccionados = [];
+        const TODOS_LOS_PRODUCTOS = {...PLATOS, ...BEBIDAS};
+
+        for (let id in TODOS_LOS_PRODUCTOS) {
+            const cant = parseInt(document.getElementById(`cant-${id}`).innerText);
+            if (cant > 0) {
+                productosSeleccionados.push({
+                    opcionMenu: parseInt(id),
+                    cantidad: cant
+                });
+            }
+        }
+
+        if (productosSeleccionados.length === 0) {
+            alert("Por favor, añade al menos un producto pulsando el botón (+).");
+            return;
+        }
+
+        const datosPedido = {
+            mesa: mesa,
+            productos: productosSeleccionados,
+            metodoPago: metodoPago
+        };
+
+        try {
+            const respuesta = await fetch('https://kanay-proyect.onrender.com/ordenar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosPedido)
+            });
+
+            const resultado = await respuesta.json();
+            
+            if (respuesta.ok) {
+                alert(`¡PEDIDO ENVIADO A COCINA!\n\nID: ${resultado.id_pedido}\nTotal a pagar: S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}\n\nMétodo: ${resultado.pago}\n\n${resultado.estado_final}`);
+                // Reiniciar el carrito tras el éxito
+                for (let id in TODOS_LOS_PRODUCTOS) {
+                    document.getElementById(`cant-${id}`).innerText = "0";
+                }
+            } else {
+                alert(`Error: ${resultado.detail}`);
+            }
+        } catch (error) {
+            alert("No se pudo conectar con el servidor de Render. Asegúrate de que el backend esté encendido.");
+        }
+    }
+</script>
+</body>
+</html>
