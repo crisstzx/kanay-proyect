@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Configuración completa de CORS para permitir la comunicación con GitHub Pages
+# Configuración completa de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,7 +22,8 @@ class ItemPedido(BaseModel):
 class PedidoEntrada(BaseModel):
     mesa: int
     productos: List[ItemPedido]
-    metodoPago: str  # Acepta tanto "1" como "Yape / Plin"
+    metodoPago: str
+    nombre: str  # <-- NUEVO: Agregamos el campo para el nombre del cliente
 
 # Diccionario con tu menú original para procesar los precios
 MENU = {
@@ -52,27 +53,23 @@ METODOS_PAGO = {"1": "Efectivo", "2": "Tarjeta", "3": "Yape"}
 def inicio():
     return {
         "sistema": "BIENVENIDO AL SISTEMA KANAY",
-        "estado": "Servidor activo en la nube",
-        "mensaje": "Escanea el QR para enviar tus pedidos a la cocina."
+        "estado": "Servidor activo en la nube"
     }
 
 @app.post("/ordenar")
 def recibir_pedido(pedido: PedidoEntrada):
-    # Validación de la mesa (1-7) tal como en tu código original
     if not (1 <= pedido.mesa <= 7):
         raise HTTPException(status_code=400, detail="Mesa no válida o fuera de rango (1-7).")
     
     subtotal = 0.0
     resumen_productos = []
     
-    # Procesamos los productos enviados en el carrito
     for item in pedido.productos:
         if item.opcionMenu not in MENU:
             raise HTTPException(status_code=400, detail=f"Opción de menú {item.opcionMenu} no existe.")
         
-        # Validación de cantidad (Máx 10 por pedido)
         if not (1 <= item.cantidad <= 10):
-            raise HTTPException(status_code=400, detail=f"Cantidad no permitida para la opción {item.opcionMenu} (Máx. 10).")
+            raise HTTPException(status_code=400, detail=f"Cantidad no permitida (Máx. 10).")
             
         prod = MENU[item.opcionMenu]
         costo_item = prod["precio"] * item.cantidad
@@ -85,15 +82,11 @@ def recibir_pedido(pedido: PedidoEntrada):
             "total_item": costo_item
         })
     
-    # Cálculos económicos originales
     igv = subtotal * 0.18
     total = subtotal + igv
     
-    # PROCESAMIENTO TOLERANTE DEL MÉTODO DE PAGO:
-    # Si viene texto largo como "Yape / Plin", extrae "Yape" o mapea el ID numérico
     pago_recibido = pedido.metodoPago.strip()
     nombre_metodo = "No especificado"
-    
     if pago_recibido in METODOS_PAGO:
         nombre_metodo = METODOS_PAGO[pago_recibido]
     elif "efectivo" in pago_recibido.lower():
@@ -105,10 +98,13 @@ def recibir_pedido(pedido: PedidoEntrada):
     
     idPedido = f"KANAY-{pedido.mesa}-2026"
     
-    # Devolvemos la respuesta formateada con la estructura que espera tu index.html
+    # Retornamos también el nombre procesado (si está vacío, le ponemos 'Cliente')
+    nombre_cliente = pedido.nombre.strip() if pedido.nombre.strip() else "Cliente"
+    
     return {
         "id_pedido": idPedido,
         "mesa": pedido.mesa,
+        "cliente": nombre_cliente,  # <-- Enviamos el nombre de vuelta
         "productos_ordenados": resumen_productos,
         "cuenta": {
             "subtotal": round(subtotal, 2),
