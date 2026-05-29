@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+import json
+import os
 
 app = FastAPI()
 
@@ -14,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 1. Definimos las estructuras de datos que recibirá la API
 class ItemPedido(BaseModel):
     opcionMenu: int
     cantidad: int
@@ -23,9 +24,8 @@ class PedidoEntrada(BaseModel):
     mesa: int
     productos: List[ItemPedido]
     metodoPago: str
-    nombre: str  # <-- NUEVO: Agregamos el campo para el nombre del cliente
+    nombre: str
 
-# Diccionario con tu menú original para procesar los precios
 MENU = {
     1: {"nombre": "Lomo Saltado", "precio": 25.00},
     2: {"nombre": "Ají de Gallina", "precio": 18.00},
@@ -51,25 +51,21 @@ METODOS_PAGO = {"1": "Efectivo", "2": "Tarjeta", "3": "Yape"}
 
 @app.get("/")
 def inicio():
-    return {
-        "sistema": "BIENVENIDO AL SISTEMA KANAY",
-        "estado": "Servidor activo en la nube"
-    }
+    return {"sistema": "BIENVENIDO AL SISTEMA KANAY", "estado": "Servidor activo"}
 
 @app.post("/ordenar")
 def recibir_pedido(pedido: PedidoEntrada):
     if not (1 <= pedido.mesa <= 7):
-        raise HTTPException(status_code=400, detail="Mesa no válida o fuera de rango (1-7).")
+        raise HTTPException(status_code=400, detail="Mesa no válida.")
     
     subtotal = 0.0
     resumen_productos = []
     
     for item in pedido.productos:
         if item.opcionMenu not in MENU:
-            raise HTTPException(status_code=400, detail=f"Opción de menú {item.opcionMenu} no existe.")
-        
+            raise HTTPException(status_code=400, detail=f"Opción {item.opcionMenu} no existe.")
         if not (1 <= item.cantidad <= 10):
-            raise HTTPException(status_code=400, detail=f"Cantidad no permitida (Máx. 10).")
+            raise HTTPException(status_code=400, detail="Cantidad no permitida.")
             
         prod = MENU[item.opcionMenu]
         costo_item = prod["precio"] * item.cantidad
@@ -97,14 +93,35 @@ def recibir_pedido(pedido: PedidoEntrada):
         nombre_metodo = "Yape"
     
     idPedido = f"KANAY-{pedido.mesa}-2026"
-    
-    # Retornamos también el nombre procesado (si está vacío, le ponemos 'Cliente')
     nombre_cliente = pedido.nombre.strip() if pedido.nombre.strip() else "Cliente"
     
+    # --- NUEVO: GUARDAR EN ARCHIVO JSON ---
+    registro_venta = {
+        "id_pedido": idPedido,
+        "cliente": nombre_cliente,
+        "mesa": pedido.mesa,
+        "total": round(total, 2),
+        "metodo_pago": nombre_metodo,
+        "productos": resumen_productos
+    }
+    
+    historial = []
+    if os.path.exists("pedidos.json"):
+        with open("pedidos.json", "r", encoding="utf-8") as f:
+            try:
+                historial = json.load(f)
+            except:
+                historial = []
+                
+    historial.append(registro_venta)
+    with open("pedidos.json", "w", encoding="utf-8") as f:
+        json.dump(historial, f, indent=4, ensure_ascii=False)
+    # ----------------------------------------
+
     return {
         "id_pedido": idPedido,
         "mesa": pedido.mesa,
-        "cliente": nombre_cliente,  # <-- Enviamos el nombre de vuelta
+        "cliente": nombre_cliente,
         "productos_ordenados": resumen_productos,
         "cuenta": {
             "subtotal": round(subtotal, 2),
@@ -115,3 +132,19 @@ def recibir_pedido(pedido: PedidoEntrada):
         "cocina": "Enviando comanda en tiempo real...",
         "estado_final": "¡PEDIDO CONFIRMADO! Su comida llegará pronto."
     }
+
+# NUEVA RUTA: Entrega el historial guardado en formato JSON
+@app.get("/historial")
+def ver_historial():
+    if os.path.exists("pedidos.json"):
+        with open("pedidos.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+# NUEVA RUTA: Por si quieres limpiar el historial y empezar desde cero
+@app.delete("/historial/limpiar")
+def limpiar_historial():
+    if os.path.exists("pedidos.json"):
+        os.remove("pedidos.json")
+        return {"mensaje": "Historial borrado con éxito."}
+    return {"mensaje": "No hay historial que borrar."}
