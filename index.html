@@ -2,79 +2,301 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kanay - Menú Digital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Kanay - Menú Digital</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #121212; color: #e0e0e0; padding-bottom: 90px; }
-        
-        .app-header { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #1f1f1f; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 1000; border-bottom: 2px solid #ff4757; }
-        .app-header h1 { color: #ff4757; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #2ecc71;
+            --primary-hover: #27ae60;
+            --text-color: #ffffff;
+            --text-secondary: #aaaaaa;
+            --border-color: #333333;
+        }
 
-        .app-container { padding: 80px 16px 20px 16px; max-width: 480px; margin: 0 auto; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px;
+        }
 
-        .config-section { background: #1e1e1e; padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #2d2d2d; }
-        .config-group { margin-bottom: 12px; }
-        .config-group:last-child { margin-bottom: 0; }
-        label { display: block; font-size: 14px; color: #a0a0a0; margin-bottom: 6px; font-weight: 500; }
-        select, input[type="number"] { width: 100%; height: 44px; background: #2d2d2d; color: white; border: 1px solid #3d3d3d; border-radius: 8px; padding: 0 12px; font-size: 16px; -webkit-appearance: none; }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-        .section-title { font-size: 16px; color: #ff4757; margin-bottom: 12px; font-weight: bold; text-align: left; text-transform: uppercase; letter-spacing: 0.5px; }
-        .menu-item { background: #1e1e1e; display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #2d2d2d; }
-        .item-info { text-align: left; flex: 1; padding-right: 10px; }
-        .item-name { font-size: 16px; font-weight: 600; color: #ffffff; margin-bottom: 4px; }
-        .item-price { font-size: 14px; color: #2ed573; font-weight: bold; }
-        
-        .quantity-control { display: flex; align-items: center; background: #2d2d2d; border-radius: 8px; overflow: hidden; height: 36px; }
-        .btn-qty { background: none; border: none; color: #ff4757; width: 36px; height: 36px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .btn-qty:active { background: #3d3d3d; }
-        .qty-value { width: 30px; text-align: center; font-size: 15px; font-weight: bold; color: white; }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
 
-        .footer-action { position: fixed; bottom: 0; left: 0; right: 0; background: #1f1f1f; padding: 12px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000; border-top: 1px solid #2d2d2d; display: flex; justify-content: center; }
-        .btn-order { width: 100%; max-width: 450px; height: 50px; background: #2ed573; color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(46, 213, 115, 0.3); -webkit-tap-highlight-color: transparent; }
-        .btn-order:active { background: #26af5f; transform: scale(0.98); }
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 16px; }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        
-        .boleta-box { background: #ffffff; color: #000000; width: 100%; max-width: 360px; border-radius: 4px; padding: 20px; font-family: 'Courier New', Courier, monospace; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-top: 8px dashed #ff4757; }
-        .boleta-header { text-align: center; margin-bottom: 15px; }
-        .boleta-title { font-weight: bold; font-size: 18px; margin-bottom: 2px; }
-        .boleta-line { border-top: 1px dashed #000; margin: 10px 0; }
-        .boleta-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
-        .boleta-items { margin: 10px 0; }
-        .boleta-total-section { font-weight: bold; margin-top: 10px; }
-        .btn-cerrar { width: 100%; height: 40px; background: #121212; color: white; border: none; font-weight: bold; margin-top: 15px; border-radius: 4px; cursor: pointer; font-family: sans-serif; }
+        .subtitle {
+            color: var(--text-secondary);
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            background: var(--surface-color);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #2a2a2a;
+            color: var(--text-color);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            color: var(--primary-color);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        .product-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-info .name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .product-info .price {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-counter {
+            background-color: #2a2a2a;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .btn-counter:active {
+            background-color: var(--primary-color);
+        }
+
+        .count-val {
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 15px;
+            text-align: center;
+        }
+
+        .footer-action {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1a1a1a;
+            padding: 15px 0;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .btn-order {
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 90%;
+            max-width: 540px;
+            transition: background-color 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-order:active {
+            background-color: var(--primary-hover);
+            transform: scale(0.98);
+        }
+
+        /* --- ESTILOS DE LA BOLETA FLOTANTE --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .boleta-box {
+            background: #ffffff;
+            color: #000000;
+            font-family: 'Courier New', Courier, monospace;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        .boleta-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .boleta-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .boleta-line {
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
+
+        .boleta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .boleta-total-section {
+            margin-top: 10px;
+            padding-top: 5px;
+        }
+
+        .boleta-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-close-modal {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <h1>KANAY PEDIDOS</h1>
-    </div>
+    <div class="container">
+        <header>
+            <h1>SISTEMA KANAY</h1>
+            <p class="subtitle">Realiza tu pedido de forma rápida y segura</p>
+        </header>
 
-    <div class="app-container">
-        <div class="config-section">
-            <div class="config-group">
-                <label for="mesa">Tu Número de Mesa:</label>
-                <select id="mesa">
-                    <option value="1">Mesa 1</option>
-                    <option value="2">Mesa 2</option>
-                    <option value="3">Mesa 3</option>
-                    <option value="4">Mesa 4</option>
-                    <option value="5">Mesa 5</option>
-                    <option value="6">Mesa 6</option>
-                    <option value="7">Mesa 7</option>
-                </select>
-            </div>
-            <div class="config-group">
-                <label for="pago">¿Cómo deseas pagar?</label>
-                <select id="pago">
-                    <option value="3">Yape / Plin</option>
-                    <option value="1">Efectivo</option>
-                    <option value="2">Tarjeta Crédito/Débito</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label for="mesa">Selecciona tu Mesa:</label>
+            <select id="mesa">
+                <option value="1">Mesa 1</option>
+                <option value="2">Mesa 2</option>
+                <option value="3">Mesa 3</option>
+                <option value="4">Mesa 4</option>
+                <option value="5">Mesa 5</option>
+                <option value="6">Mesa 6</option>
+                <option value="7">Mesa 7</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="pago">Método de Pago:</label>
+            <select id="pago">
+                <option value="3">Yape / Plin</option>
+                <option value="1">Efectivo</option>
+                <option value="2">Tarjeta Crédito/Débito</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cliente-nombre">Nombre para la Boleta:</label>
+            <input type="text" id="cliente-nombre" placeholder="Ej. Diego Dávila" autocomplete="off">
         </div>
 
         <div class="section-title">Platos de Fondo</div>
@@ -85,7 +307,7 @@
     </div>
 
     <div class="footer-action">
-        <button class="btn-order" onclick="enviarPedido()">CONFIRMAR PEDIDO</button>
+        <button class="btn-order" onclick="enviarPedido()">Confirmar Pedido</button>
     </div>
 
     <div class="modal-overlay" id="modal-boleta">
@@ -97,8 +319,9 @@
                 <div class="boleta-line"></div>
                 <div style="font-weight: bold;" id="bol-id">BOLETA: #00000</div>
                 <div id="bol-mesa" style="font-size: 13px;">MESA: X</div>
+                <div id="bol-cliente" style="font-size: 13px; font-weight: bold; margin-top: 2px;">CLIENTE: X</div>
             </div>
-            
+
             <div class="boleta-line"></div>
             <div class="boleta-row" style="font-weight: bold; font-size: 12px;">
                 <span>CANT. PRODUCTO</span>
@@ -106,171 +329,185 @@
             </div>
             <div class="boleta-line"></div>
             
-            <div class="boleta-items" id="bol-productos"></div>
-            
+            <div id="bol-productos"></div>
+
             <div class="boleta-line"></div>
             
-            <div class="boleta-row">
-                <span>Subtotal:</span>
-                <span id="bol-subtotal">S/. 0.00</span>
+            <div class="boleta-total-section">
+                <div class="boleta-row">
+                    <span>SUBTOTAL:</span>
+                    <span id="bol-subtotal">S/. 0.00</span>
+                </div>
+                <div class="boleta-row">
+                    <span>IGV (18%):</span>
+                    <span id="bol-igv">S/. 0.00</span>
+                </div>
+                <div class="boleta-row" style="font-weight: bold; font-size: 16px; margin-top: 5px;">
+                    <span>TOTAL A PAGAR:</span>
+                    <span id="bol-total">S/. 0.00</span>
+                </div>
             </div>
-            <div class="boleta-row">
-                <span>IGV (18%):</span>
-                <span id="bol-igv">S/. 0.00</span>
-            </div>
+
             <div class="boleta-line"></div>
-            <div class="boleta-row boleta-total-section">
-                <span>TOTAL A PAGAR:</span>
-                <span id="bol-total" style="font-size: 16px;">S/. 0.00</span>
-            </div>
-            <div class="boleta-row" style="margin-top: 5px; font-size: 12px;">
-                <span>Método Pago:</span>
-                <span id="bol-pago" style="font-weight: bold;">-</span>
-            </div>
+            <div style="font-size: 13px; font-style: italic;" id="bol-pago">Validando pago...</div>
+            <div style="font-size: 13px; color: #555;" id="bol-cocina">Enviando comanda...</div>
             
-            <div class="boleta-line"></div>
-            <div style="text-align: center; font-size: 12px; font-style: italic;">
-                ¡Gracias por su preferencia!<br>Su pedido ya se está cocinando.
+            <div class="boleta-footer" id="bol-estado">
+                ¡PEDIDO CONFIRMADO!
             </div>
-            
-            <button class="btn-cerrar" onclick="cerrarBoleta()">CERRAR</button>
+
+            <button class="btn-close-modal" onclick="cerrarModal()">Cerrar Boleta</button>
         </div>
     </div>
 
-<script>
-    const PLATOS = {
-        1: {nombre: "Lomo Saltado", precio: 25.00},
-        2: {nombre: "Ají de Gallina", precio: 18.00},
-        3: {nombre: "Pescado frito", precio: 16.00},
-        4: {nombre: "Alitas BBQ", precio: 22.00},
-        5: {nombre: "Ceviche", precio: 20.00},
-        6: {nombre: "Postre del Día", precio: 12.00},
-        7: {nombre: "Arroz a la cubana", precio: 15.00},
-        8: {nombre: "Chaufa de pollo", precio: 21.00},
-        9: {nombre: "Tallarines verdes", precio: 19.00},
-        10: {nombre: "Pollo a la brasa", precio: 30.00},
-        11: {nombre: "Causa limeña", precio: 14.00},
-        12: {nombre: "Arroz con pato", precio: 25.00}
-    };
-
-    const BEBIDAS = {
-        13: {nombre: "Chicha Morada (Jarra)", precio: 15.00},
-        14: {nombre: "Limonada Frozen", precio: 10.00},
-        15: {nombre: "Jugo de Maracuyá", precio: 8.00},
-        16: {nombre: "Gaseosa", precio: 5.00},
-        17: {nombre: "Cerveza Personal", precio: 9.00},
-        18: {nombre: "Agua Mineral", precio: 4.00}
-    };
-
-    const TODOS_PRODUCTOS = {...PLATOS, ...BEBIDAS};
-
-    function renderizarSeccion(objetoProductos, contenedorId) {
-        const contenedor = document.getElementById(contenedorId);
-        for (let id in objetoProductos) {
-            contenedor.innerHTML += `
-                <div class="menu-item">
-                    <div class="item-info">
-                        <div class="item-name">${objetoProductos[id].nombre}</div>
-                        <div class="item-price">S/. ${objetoProductos[id].precio.toFixed(2)}</div>
-                    </div>
-                    <div class="quantity-control">
-                        <button class="btn-qty" onclick="cambiarCantidad(${id}, -1)">-</button>
-                        <div class="qty-value" id="cant-${id}">0</div>
-                        <button class="btn-qty" onclick="cambiarCantidad(${id}, 1)">+</button>
-                    </div>
-                </div>
-            `;
-        }
-    }
-
-    renderizarSeccion(PLATOS, 'lista-platos');
-    renderizarSeccion(BEBIDAS, 'lista-bebidas');
-
-    function cambiarCantidad(id, cambio) {
-        const elemento = document.getElementById(`cant-${id}`);
-        let cantidadActual = parseInt(elemento.innerText);
-        cantidadActual += cambio;
-        if (cantidadActual >= 0 && cantidadActual <= 10) {
-            elemento.innerText = cantidadActual;
-        }
-    }
-
-    async function enviarPedido() {
-        const mesa = parseInt(document.getElementById('mesa').value);
-        const metodoPago = document.getElementById('pago').value;
-        
-        let productosSeleccionados = [];
-        for (let id in TODOS_PRODUCTOS) {
-            const cant = parseInt(document.getElementById(`cant-${id}`).innerText);
-            if (cant > 0) {
-                productosSeleccionados.push({
-                    opcionMenu: parseInt(id),
-                    cantidad: cant
-                });
-            }
-        }
-
-        if (productosSeleccionados.length === 0) {
-            alert("Por favor, añade al menos un producto.");
-            return;
-        }
-
-        const datosPedido = {
-            mesa: mesa,
-            productos: productosSeleccionados,
-            metodoPago: metodoPago
+    <script>
+        // Catálogo local para renderizar la UI de forma idéntica al diccionario de Python
+        const TODOS_PRODUCTOS = {
+            1: {nombre: "Lomo Saltado", precio: 25.00, tipo: "plato"},
+            2: {nombre: "Ají de Gallina", precio: 18.00, tipo: "plato"},
+            3: {nombre: "Pescado frito", precio: 16.00, tipo: "plato"},
+            4: {nombre: "Alitas BBQ", precio: 22.00, tipo: "plato"},
+            5: {nombre: "Ceviche", precio: 20.00, tipo: "plato"},
+            6: {nombre: "Postre del Día", precio: 12.00, tipo: "plato"},
+            7: {nombre: "Arroz a la cubana", precio: 15.00, tipo: "plato"},
+            8: {nombre: "Chaufa de pollo", precio: 21.00, tipo: "plato"},
+            9: {nombre: "Tallarines verdes", precio: 19.00, tipo: "plato"},
+            10: {nombre: "Pollo a la brasa", precio: 30.00, tipo: "plato"},
+            11: {nombre: "Causa limeña", precio: 14.00, tipo: "plato"},
+            12: {nombre: "Arroz con pato", precio: 25.00, tipo: "plato"},
+            13: {nombre: "Chicha Morada (Jarra)", precio: 15.00, tipo: "bebida"},
+            14: {nombre: "Limonada Frozen", precio: 10.00, tipo: "bebida"},
+            15: {nombre: "Jugo de Maracuyá", precio: 8.00, tipo: "bebida"},
+            16: {nombre: "Gaseosa (Inca/Coca)", precio: 5.00, tipo: "bebida"},
+            17: {nombre: "Cerveza Personal", precio: 9.00, tipo: "bebida"},
+            18: {nombre: "Agua Mineral", precio: 4.00, tipo: "bebida"}
         };
 
-        try {
-            // AQUÍ ESTABA EL ERROR CORREGIDO: URL apuntando directo a /ordenar en Render
-            const respuesta = await fetch('https://kanay-proyect.onrender.com/ordenar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datosPedido)
-            });
+        function renderizarMenu() {
+            const contenedorPlatos = document.getElementById('lista-platos');
+            const contenedorBebidas = document.getElementById('lista-bebidas');
 
-            const resultado = await respuesta.json();
-            
-            if (respuesta.ok) {
-                document.getElementById('bol-id').innerText = `BOLETA: #${resultado.id_pedido.substring(0,8).toUpperCase()}`;
-                document.getElementById('bol-mesa').innerText = `MESA SELECCIONADA: ${mesa}`;
-                document.getElementById('bol-pago').innerText = resultado.pago;
-                document.getElementById('bol-fecha').innerText = `Fecha: ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                
-                const contenedorItems = document.getElementById('bol-productos');
-                contenedorItems.innerHTML = '';
-                
-                productosSeleccionados.forEach(prod => {
-                    const infoProd = TODOS_PRODUCTOS[prod.opcionMenu];
-                    const subtotalItem = infoProd.precio * prod.cantidad;
-                    contenedorItems.innerHTML += `
-                        <div class="boleta-row">
-                            <span>${prod.cantidad}x ${infoProd.nombre}</span>
-                            <span>S/. ${subtotalItem.toFixed(2)}</span>
+            for (let id in TODOS_PRODUCTOS) {
+                const prod = TODOS_PRODUCTOS[id];
+                const cardHTML = `
+                    <div class="product-card">
+                        <div class="product-info">
+                            <div class="name">${prod.nombre}</div>
+                            <div class="price">S/. ${prod.precio.toFixed(2)}</div>
                         </div>
-                    `;
+                        <div class="counter">
+                            <div class="btn-counter" onclick="cambiarCantidad(${id}, -1)">-</div>
+                            <div class="count-val" id="cant-${id}">0</div>
+                            <div class="btn-counter" onclick="cambiarCantidad(${id}, 1)">+</div>
+                        </div>
+                    </div>
+                `;
+                if (prod.tipo === "plato") {
+                    contenedorPlatos.innerHTML += cardHTML;
+                } else {
+                    contenedorBebidas.innerHTML += cardHTML;
+                }
+            }
+        }
+
+        function cambiarCantidad(id, cambio) {
+            const elemento = document.getElementById(`cant-${id}`);
+            let actual = parseInt(elemento.innerText);
+            actual += cambio;
+            if (actual < 0) actual = 0;
+            if (actual > 10) actual = 10; // Límite de 10 por validación de seguridad de Python
+            elemento.innerText = actual;
+        }
+
+        async function enviarPedido() {
+            const mesa = parseInt(document.getElementById('mesa').value);
+            const metodoPago = document.getElementById('pago').value;
+            const nombreCliente = document.getElementById('cliente-nombre').value; // Captura el nombre ingresado
+            
+            let productosSeleccionados = [];
+            for (let id in TODOS_PRODUCTOS) {
+                const cant = parseInt(document.getElementById(`cant-${id}`).innerText);
+                if (cant > 0) {
+                    productosSeleccionados.push({
+                        opcionMenu: parseInt(id),
+                        cantidad: cant
+                    });
+                }
+            }
+
+            if (productosSeleccionados.length === 0) {
+                alert("Por favor, añade al menos un producto a tu carrito.");
+                return;
+            }
+
+            // Construcción del objeto JSON JSON que viaja a tu API de Render
+            const datosPedido = {
+                mesa: mesa,
+                productos: productosSeleccionados,
+                metodoPago: String(metodoPago),
+                nombre: nombreCliente // Mapeado exacto con tu PedidoEntrada de FastAPI
+            };
+
+            try {
+                const respuesta = await fetch('https://kanay-proyect.onrender.com/ordenar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosPedido)
                 });
 
-                document.getElementById('bol-subtotal').innerText = `S/. ${resultado.cuenta.subtotal.toFixed(2)}`;
-                document.getElementById('bol-igv').innerText = `S/. ${resultado.cuenta.igv_18.toFixed(2)}`;
-                document.getElementById('bol-total').innerText = `S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}`;
+                const resultado = await respuesta.json();
+                
+                if (respuesta.ok) {
+                    // Pintar los datos dinámicos devueltos por el Servidor
+                    document.getElementById('bol-id').innerText = `BOLETA: #${resultado.id_pedido.toUpperCase()}`;
+                    document.getElementById('bol-mesa').innerText = `MESA SELECCIONADA: ${mesa}`;
+                    document.getElementById('bol-cliente').innerText = `CLIENTE: ${resultado.cliente.toUpperCase()}`; // Muestra el nombre en el ticket
+                    document.getElementById('bol-pago').innerText = resultado.pago;
+                    document.getElementById('bol-cocina').innerText = resultado.cocina;
+                    document.getElementById('bol-estado').innerText = resultado.estado_final;
+                    document.getElementById('bol-fecha').innerText = `Fecha: ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    
+                    const contenedorItems = document.getElementById('bol-productos');
+                    contenedorItems.innerHTML = '';
+                    
+                    productosSeleccionados.forEach(prod => {
+                        const infoProd = TODOS_PRODUCTOS[prod.opcionMenu];
+                        const subtotalItem = infoProd.precio * prod.cantidad;
+                        contenedorItems.innerHTML += `
+                            <div class="boleta-row">
+                                <span>${prod.cantidad}x ${infoProd.nombre}</span>
+                                <span>S/. ${subtotalItem.toFixed(2)}</span>
+                            </div>
+                        `;
+                    });
 
-                document.getElementById('modal-boleta').classList.add('active');
+                    // Sincronización precisa con las variables económicas de tu Python
+                    document.getElementById('bol-subtotal').innerText = `S/. ${resultado.cuenta.subtotal.toFixed(2)}`;
+                    document.getElementById('bol-igv').innerText = `S/. ${resultado.cuenta.igv_18.toFixed(2)}`; // Mapea igv_18
+                    document.getElementById('bol-total').innerText = `S/. ${resultado.cuenta.total_a_pagar.toFixed(2)}`;
 
-            } else {
-                alert(`Error: ${resultado.detail}`);
+                    // Abrir modal de boleta flotante
+                    document.getElementById('modal-boleta').classList.add('active');
+
+                } else {
+                    alert(`Error en el servidor: ${resultado.detail}`);
+                }
+            } catch (error) {
+                alert("Error al conectar con Render. Asegúrate de que el backend esté encendido y operativo.");
             }
-        } catch (error) {
-            alert("Error al conectar con Render. Asegúrate de que el backend esté encendido.");
         }
-    }
 
-    function cerrarBoleta() {
-        document.getElementById('modal-boleta').classList.remove('active');
-        for (let id in TODOS_PRODUCTOS) {
-            document.getElementById(`cant-${id}`).innerText = "0";
+        function cerrarModal() {
+            document.getElementById('modal-boleta').classList.remove('active');
+            // Opcional: Limpiar contadores de cantidades al cerrar
+            for (let id in TODOS_PRODUCTOS) {
+                document.getElementById(`cant-${id}`).innerText = "0";
+            }
+            document.getElementById('cliente-nombre').value = "";
         }
-    }
-</script>
+
+        // Ejecutar el armado dinámico al iniciar la página
+        window.onload = renderizarMenu;
+    </script>
 </body>
 </html>
