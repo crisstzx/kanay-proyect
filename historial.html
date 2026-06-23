@@ -5,75 +5,223 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Ventas - Sistema Kanay</title>
     <style>
+        :root {
+            --bg-color: #0b0c10;
+            --surface-color: #1f2833;
+            --surface-card: #151a22;
+            --primary-color: #45f3ff;
+            --accent-color: #2ecc71;
+            --accent-hover: #27ae60;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --text-color: #c5c6c7;
+            --text-light: #ffffff;
+            --border-color: #2f3e46;
+        }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
+
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #333;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            background: linear-gradient(180deg, rgba(69,243,255,0.05) 0%, rgba(0,0,0,0) 100%);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0 0 20px 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        h1 { color: #2ecc71; margin: 0; font-size: 24px; }
-        .btn-refresh {
-            background-color: #2ecc71;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
+
+        .header-title h1 {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
         }
-        .btn-clear {
-            background-color: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-left: 10px;
+
+        .header-title h1 span {
+            color: var(--accent-color);
         }
-        .pedido-card {
-            background-color: #1e1e1e;
-            border: 1px solid #333;
+
+        .subtitle {
+            color: #85929e;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
             border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        .btn-refresh {
+            background-color: var(--accent-color);
+            color: #000;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+        }
+
+        .btn-refresh:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-clear {
+            background-color: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .btn-clear:hover {
+            background-color: var(--danger-color);
+            color: var(--text-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .pedido-card {
+            background-color: var(--surface-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transition: border-color 0.3s ease;
+        }
+
+        .pedido-card:hover {
+            border-color: rgba(69, 243, 255, 0.25);
+        }
+
         .pedido-header {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px dashed #444;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
+            align-items: center;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
             font-size: 14px;
         }
-        .id-pedido { font-weight: bold; color: #2ecc71; }
-        .total-pedido { font-size: 18px; font-weight: bold; color: #f1c40f; }
+
+        .id-pedido {
+            font-weight: bold;
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+            background: rgba(69, 243, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .pedido-meta {
+            color: #85929e;
+        }
+
+        .pedido-meta b {
+            color: var(--text-light);
+        }
+
+        .cliente-badge {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .cliente-badge span {
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .productos-box {
+            background-color: #0f141c;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(47, 62, 70, 0.5);
+        }
+
         .producto-line {
             display: flex;
             justify-content: space-between;
             font-size: 14px;
-            color: #ccc;
-            margin-bottom: 4px;
+            color: var(--text-color);
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(47, 62, 70, 0.2);
         }
+
+        .producto-line:last-child {
+            border-bottom: none;
+        }
+
+        .producto-nombre {
+            display: flex;
+            gap: 8px;
+        }
+
+        .producto-cant {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .pedido-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .total-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #85929e;
+        }
+
+        .total-pedido {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(69, 243, 255, 0.2);
+        }
+
         .vacio {
             text-align: center;
-            color: #888;
-            margin-top: 5px;
+            color: #556270;
+            margin-top: 40px;
             font-style: italic;
+            font-size: 16px;
+            background: var(--surface-card);
+            padding: 40px;
+            border-radius: 14px;
+            border: 1px dashed var(--border-color);
         }
     </style>
 </head>
@@ -81,18 +229,18 @@
 
     <div class="container">
         <header>
-            <div>
-                <h1>📊 PANEL DE CONTROL KANAY</h1>
-                <div style="color: #aaa; font-size: 13px; margin-top: 3px;">Historial de comandas enviadas a cocina</div>
+            <div class="header-title">
+                <h1>📊 PANEL DE CONTROL <span>KANAY</span></h1>
+                <div class="subtitle">Historial de comandas enviadas a cocina en tiempo real</div>
             </div>
-            <div>
-                <button class="btn-refresh" onclick="cargarHistorial()">🔄 Actualizar</button>
-                <button class="btn-clear" onclick="limpiarHistorial()">🗑️ Limpiar Todo</button>
+            <div class="header-actions">
+                <button class="btn btn-refresh" onclick="cargarHistorial()">🔄 Actualizar</button>
+                <button class="btn btn-clear" onclick="limpiarHistorial()">🗑️ Limpiar Todo</button>
             </div>
         </header>
 
         <div id="contenedor-pedidos">
-            <p class="vacio">Cargando registros...</p>
+            <p class="vacio">Cargando registros del servidor...</p>
         </div>
     </div>
 
@@ -108,60 +256,87 @@
                 
                 contenedor.innerHTML = '';
 
-                if (listaPedidos.length === 0) {
+                if (!listaPedidos || listaPedidos.length === 0) {
                     contenedor.innerHTML = '<p class="vacio">No hay pedidos registrados en este turno.</p>';
                     return;
                 }
 
-                // Mostrar los más nuevos arriba (revertimos el array)
+                // Desplegar los pedidos más recientes primero
                 listaPedidos.reverse().forEach(pedido => {
                     let productosHTML = '';
-                    pedido.productos.forEach(p => {
+                    
+                    // Adaptación segura: procesa si viene mapeado como 'platos', 'platos_ordenados' o 'productos'
+                    const items = pedido.platos || pedido.platos_ordenados || pedido.productos || [];
+                    
+                    items.forEach(p => {
+                        const nombrePlato = p.plato || p.producto || "Plato Desconocido";
+                        const totalItem = p.total_item !== undefined ? p.total_item : 0;
+                        
                         productosHTML += `
                             <div class="producto-line">
-                                <span>• ${p.cantidad}x ${p.producto}</span>
-                                <span>S/. ${p.total_item.toFixed(2)}</span>
+                                <div class="producto-nombre">
+                                    <span class="producto-cant">${p.cantidad}x</span>
+                                    <span>${nombrePlato}</span>
+                                </div>
+                                <span>S/. ${totalItem.toFixed(2)}</span>
                             </div>
                         `;
                     });
 
+                    // Adaptación segura para el cálculo del total final
+                    let totalFinal = 0;
+                    if (pedido.cuenta && pedido.cuenta.total_a_pagar !== undefined) {
+                        totalFinal = pedido.cuenta.total_a_pagar;
+                    } else if (pedido.total !== undefined) {
+                        totalFinal = pedido.total;
+                    }
+
+                    const mesa = pedido.mesa || "N/A";
+                    const metodoPago = pedido.metodo_pago || pedido.metodoPago || "No especificado";
+                    const cliente = pedido.cliente || pedido.nombre || "Cliente";
+
                     contenedor.innerHTML += `
                         <div class="pedido-card">
                             <div class="pedido-header">
-                                <span class="id-pedido">${pedido.id_pedido}</span>
-                                <span><b>Mesa:</b> ${pedido.mesa} | <b>Pago:</b> ${pedido.metodo_pago}</span>
+                                <span class="id-pedido">#${(pedido.id_pedido || "0000").toUpperCase()}</span>
+                                <span class="pedido-meta"><b>Mesa:</b> ${mesa} | <b>Pago:</b> ${metodoPago}</span>
                             </div>
-                            <div style="margin-bottom: 10px; font-size: 15px;">
-                                <b>Cliente:</b> ${pedido.cliente.toUpperCase()}
+                            <div class="cliente-badge">
+                                Cliente: <span>${cliente.toUpperCase()}</span>
                             </div>
-                            <div style="margin-top: 5px; margin-bottom: 12px;">
+                            <div class="productos-box">
                                 ${productosHTML}
                             </div>
-                            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
-                                <span style="font-size: 12px; color: #888;">Cobrado:</span>
-                                <span class="total-pedido">S/. ${pedido.total.toFixed(2)}</span>
+                            <div class="pedido-footer">
+                                <span class="total-label">Total Cobrado:</span>
+                                <span class="total-pedido">S/. ${totalFinal.toFixed(2)}</span>
                             </div>
                         </div>
                     `;
                 });
 
             } catch (error) {
-                contenedor.innerHTML = '<p class="vacio" style="color: #e74c3c;">Error al conectar con el servidor de Render.</p>';
+                console.error(error);
+                contenedor.innerHTML = '<p class="vacio" style="color: var(--danger-color); border-color: var(--danger-color);">Error al conectar con el servidor de Render. Asegúrate de que el servicio esté activo.</p>';
             }
         }
 
         async function limpiarHistorial() {
-            if(!confirm("¿Estás seguro de que quieres borrar de forma permanente todo el historial de ventas?")) return;
+            if(!confirm("¿Estás seguro de que deseas borrar permanentemente todo el historial de ventas? Esta acción no se puede deshacer.")) return;
             
             try {
-                await fetch('https://kanay-proyect.onrender.com/historial/limpiar', { method: 'DELETE' });
-                cargarHistorial();
+                const respuesta = await fetch('https://kanay-proyect.onrender.com/historial/limpiar', { method: 'DELETE' });
+                if(respuesta.ok) {
+                    cargarHistorial();
+                } else {
+                    alert("El servidor denegó la acción de limpieza.");
+                }
             } catch (error) {
-                alert("No se pudo limpiar el historial.");
+                alert("No se pudo conectar con el servidor para limpiar el historial.");
             }
         }
 
-        // Cargar datos automáticamente al abrir la pantalla
+        // Carga automática inicial
         window.onload = cargarHistorial;
     </script>
 </body>
