@@ -22,7 +22,7 @@ class ItemPedido(BaseModel):
 
 class PedidoEntrada(BaseModel):
     mesa: int
-    productos: List[ItemPedido]
+    platos: List[ItemPedido]
     metodoPago: str
     nombre: str
 
@@ -59,22 +59,22 @@ def recibir_pedido(pedido: PedidoEntrada):
         raise HTTPException(status_code=400, detail="Mesa no válida.")
     
     subtotal = 0.0
-    resumen_productos = []
+    resumen_platos = []
     
-    for item in pedido.productos:
+    for item in pedido.platos:
         if item.opcionMenu not in MENU:
             raise HTTPException(status_code=400, detail=f"Opción {item.opcionMenu} no existe.")
         if not (1 <= item.cantidad <= 10):
             raise HTTPException(status_code=400, detail="Cantidad no permitida.")
             
-        prod = MENU[item.opcionMenu]
-        costo_item = prod["precio"] * item.cantidad
+        plat = MENU[item.opcionMenu]
+        costo_item = plat["precio"] * item.cantidad
         subtotal += costo_item
         
         resumen_productos.append({
-            "producto": prod["nombre"],
+            "plato": plat["nombre"],
             "cantidad": item.cantidad,
-            "precio_unitario": prod["precio"],
+            "precio_unitario": plat["precio"],
             "total_item": costo_item
         })
     
@@ -102,7 +102,7 @@ def recibir_pedido(pedido: PedidoEntrada):
         "mesa": pedido.mesa,
         "total": round(total, 2),
         "metodo_pago": nombre_metodo,
-        "productos": resumen_productos
+        "platos": resumen_platos
     }
     
     historial = []
@@ -119,10 +119,10 @@ def recibir_pedido(pedido: PedidoEntrada):
     # ----------------------------------------
 
     return {
-        "id_pedido": idPedido,
+        "id_plato": idPlato,
         "mesa": pedido.mesa,
         "cliente": nombre_cliente,
-        "productos_ordenados": resumen_productos,
+        "platos_ordenados": resumen_platos,
         "cuenta": {
             "subtotal": round(subtotal, 2),
             "igv_18": round(igv, 2),
