@@ -119,7 +119,7 @@ def recibir_pedido(pedido: PedidoEntrada):
     # ----------------------------------------
 
     return {
-        "id_plato": idPlato,
+        "id_pedido": idPedido,
         "mesa": pedido.mesa,
         "cliente": nombre_cliente,
         "platos_ordenados": resumen_platos,
