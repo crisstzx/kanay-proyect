@@ -324,12 +324,12 @@
 
             <div class="boleta-line"></div>
             <div class="boleta-row" style="font-weight: bold; font-size: 12px;">
-                <span>CANT. PRODUCTO</span>
+                <span>CANT. PLATO/S</span>
                 <span>TOTAL</span>
             </div>
             <div class="boleta-line"></div>
             
-            <div id="bol-productos"></div>
+            <div id="bol-platos"></div>
 
             <div class="boleta-line"></div>
             
@@ -387,13 +387,13 @@
             const contenedorPlatos = document.getElementById('lista-platos');
             const contenedorBebidas = document.getElementById('lista-bebidas');
 
-            for (let id in TODOS_PRODUCTOS) {
-                const prod = TODOS_PRODUCTOS[id];
+            for (let id in TODOS_PLATOS) {
+                const prod = TODOS_PLATOS[id];
                 const cardHTML = `
                     <div class="product-card">
                         <div class="product-info">
-                            <div class="name">${prod.nombre}</div>
-                            <div class="price">S/. ${prod.precio.toFixed(2)}</div>
+                            <div class="name">${plat.nombre}</div>
+                            <div class="price">S/. ${plat.precio.toFixed(2)}</div>
                         </div>
                         <div class="counter">
                             <div class="btn-counter" onclick="cambiarCantidad(${id}, -1)">-</div>
@@ -424,18 +424,18 @@
             const metodoPago = document.getElementById('pago').value;
             const nombreCliente = document.getElementById('cliente-nombre').value; // Captura el nombre ingresado
             
-            let productosSeleccionados = [];
-            for (let id in TODOS_PRODUCTOS) {
+            let platosSeleccionados = [];
+            for (let id in TODOS_PLATOS) {
                 const cant = parseInt(document.getElementById(`cant-${id}`).innerText);
                 if (cant > 0) {
-                    productosSeleccionados.push({
+                    pl<platosSeleccionados.push({
                         opcionMenu: parseInt(id),
                         cantidad: cant
                     });
                 }
             }
 
-            if (productosSeleccionados.length === 0) {
+            if (platosSeleccionados.length === 0) {
                 alert("Por favor, añade al menos un producto a tu carrito.");
                 return;
             }
@@ -443,7 +443,7 @@
             // Construcción del objeto JSON JSON que viaja a tu API de Render
             const datosPedido = {
                 mesa: mesa,
-                productos: productosSeleccionados,
+                productos: platosSeleccionados,
                 metodoPago: String(metodoPago),
                 nombre: nombreCliente // Mapeado exacto con tu PedidoEntrada de FastAPI
             };
@@ -467,15 +467,15 @@
                     document.getElementById('bol-estado').innerText = resultado.estado_final;
                     document.getElementById('bol-fecha').innerText = `Fecha: ${new Date().toLocaleDateString()} - ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
                     
-                    const contenedorItems = document.getElementById('bol-productos');
+                    const contenedorItems = document.getElementById('bol-platos');
                     contenedorItems.innerHTML = '';
                     
-                    productosSeleccionados.forEach(prod => {
-                        const infoProd = TODOS_PRODUCTOS[prod.opcionMenu];
-                        const subtotalItem = infoProd.precio * prod.cantidad;
+                    platosSeleccionados.forEach(plat => {
+                        const infoPlat = TODOS_PLATOS[plat.opcionMenu];
+                        const subtotalItem = infoPlat.precio * plat.cantidad;
                         contenedorItems.innerHTML += `
                             <div class="boleta-row">
-                                <span>${prod.cantidad}x ${infoProd.nombre}</span>
+                                <span>${plat.cantidad}x ${infoPlat.nombre}</span>
                                 <span>S/. ${subtotalItem.toFixed(2)}</span>
                             </div>
                         `;
