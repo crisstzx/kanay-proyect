@@ -71,7 +71,7 @@ def recibir_pedido(pedido: PedidoEntrada):
         costo_item = plat["precio"] * item.cantidad
         subtotal += costo_item
         
-        resumen_productos.append({
+        resumen_platos.append({
             "plato": plat["nombre"],
             "cantidad": item.cantidad,
             "precio_unitario": plat["precio"],
